@@ -1,0 +1,57 @@
+Pikado
+Copyright (c) 2026 Neiell Care L. Paradiang
+Copyright (c) 2026 Lucas Van De Weerd
+Licensed under the MIT License. See LICENSE.
+
+This repository is a fork of koneb71/pikado
+(https://github.com/koneb71/pikado) by Neiell Care L. Paradiang, MIT.
+CHANGELOG.md lists what this fork changes.
+
+Runtime dependency
+------------------
+
+libheif-js 1.23.5 (LGPL-3.0)
+  https://github.com/catdad-experiments/libheif-js
+  A WebAssembly build of libheif (https://github.com/strukturag/libheif)
+  and libde265 (https://github.com/strukturag/libde265), both LGPL-3.0,
+  used to decode HEIC and HEIF images.
+
+  This library is NOT covered by Pikado's MIT licence. It ships as the npm
+  package's own file, unmodified, as a separate asset that is loaded by URL
+  only when a HEIC file is opened (src/io/heif-read.js), so it can be
+  replaced with any compatible build. Its source is in the three
+  repositories above. The GNU Lesser General Public License 3.0 and the GNU
+  General Public License 3.0 it refers to are in public/licenses/ and ship
+  with every build as licenses/LGPL-3.0.txt and licenses/GPL-3.0.txt.
+
+Vendored code
+-------------
+
+src/vendor/liquid-glass.css
+  Design tokens from LiquidGlass-UI by Hollan Yuan (MIT).
+  https://github.com/hwyuanzi/LiquidGlass-UI
+  Licence text: src/vendor/liquid-glass.LICENSE. src/ui/glass.js is adapted
+  from the same project.
+
+Fonts
+-----
+
+No font files are in this repository. The font catalogue in src/text/ is a
+list of family names fetched from Google Fonts by
+scripts/fetch-google-fonts.mjs; a font is downloaded from Google Fonts to the
+user's own browser when they pick it, under that font's own licence.
+
+Development dependency
+----------------------
+
+vite (MIT)
+
+Other
+-----
+
+Contributor Covenant 2.1 (CC BY 4.0)
+  CODE_OF_CONDUCT.md is adapted from it.
+  https://www.contributor-covenant.org
+
+Photoshop and Photopea are trademarks of their respective owners. Pikado is
+an independent implementation and is not affiliated with either.

@@ -110,8 +110,9 @@ export class Dialog {
     document.body.appendChild(this.overlay);
     window.addEventListener('keydown', this._keyHandler, true);
 
-    // The overlay starts at opacity 0 and transitions in once `.open` lands, so
-    // the class has to be added on a later tick or the transition never plays.
+    // The dialog starts at opacity 0 and transitions in once `.open` lands on
+    // the overlay, so the class has to be added on a later tick or the
+    // transition never plays.
     // requestAnimationFrame alone is not enough: a backgrounded tab never fires
     // it, which leaves the dialog mounted but permanently invisible. Race it
     // against a timer so the dialog always becomes visible.

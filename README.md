@@ -1,7 +1,29 @@
+<div align="center">
+
+<img src="public/icon-512.png" alt="" width="96">
+
 # Pikado
 
-A browser-based raster and vector image editor in the spirit of Photopea and
-Photoshop. Everything runs client-side — no server, no upload, no account.
+**A browser-based raster and vector image editor in the spirit of Photopea and Photoshop.**
+
+Everything runs client-side — no server, no upload, no account.
+
+[Quick start](#quick-start) · [Screenshots](#screenshots) · [What it is](#what-it-is) · [File formats](#file-formats) · [What is not implemented](#what-is-not-implemented) · [Architecture](ARCHITECTURE.md)
+
+![Licence: MIT](https://img.shields.io/badge/licence-MIT-blue)
+[![Fork of koneb71/pikado](https://img.shields.io/badge/fork%20of-koneb71%2Fpikado-8250df)](https://github.com/koneb71/pikado)
+![Plain ES modules](https://img.shields.io/badge/framework-none-brightgreen)
+![Installable PWA](https://img.shields.io/badge/PWA-works%20offline-5a0fc8)
+
+<img src="docs/editor.jpg" alt="The editor with a photo open: tools down the left, the canvas with rulers in the middle, and Layers, Color and Properties panels on the right; the Layers panel holds a text layer, a Curves adjustment layer and the background" width="900">
+
+</div>
+
+> [!NOTE]
+> This is a fork of [koneb71/pikado](https://github.com/koneb71/pikado) by Neiell Care L. Paradiang. It adds a glass look for menus and dialogs; [CHANGELOG.md](CHANGELOG.md) lists everything the fork changes.
+
+<details>
+<summary><b>Three things reach the network, and only these three</b></summary>
 
 Three things reach the network, and only these three. **Generative Fill** is off
 until you supply your own API key, and then sends the part of your image you
@@ -14,8 +36,12 @@ it from had already made, sent without cookies and without a referrer, and only
 at the moment you make that drag. Nothing else leaves your machine, and
 everything keeps working without any of them.
 
+</details>
+
+## Quick start
+
 ```bash
-git clone https://github.com/koneb71/pikado.git
+# not on GitHub yet: start from a copy of this folder
 cd pikado
 npm install
 npm run dev      # http://localhost:5173 (Vite takes the next free port if busy)
@@ -26,7 +52,10 @@ npm test         # opens the regression suite at /tests/
 Vite builds it, and there is no build step to configure, no framework, and no
 TypeScript — the source is plain ES modules that a browser could load directly.
 The one runtime dependency is [libheif-js](https://github.com/catdad-experiments/libheif-js),
-the HEIC decoder, and nobody downloads it until they open a HEIC.
+the HEIC decoder, and nobody downloads it until they open a HEIC. The glass on
+menus and dialogs uses the design tokens of
+[LiquidGlass-UI](https://github.com/hwyuanzi/LiquidGlass-UI), vendored as one
+CSS file in `src/vendor/`.
 
 Or with Docker, which builds the bundle and serves it from nginx:
 
@@ -34,6 +63,9 @@ Or with Docker, which builds the bundle and serves it from nginx:
 docker build -t pikado .
 docker run --rm -p 8080:80 pikado    # http://localhost:8080
 ```
+
+<details>
+<summary>What is in the Docker image</summary>
 
 Nothing runs server-side, so the image carries no Node at all — just nginx and
 about 3.4 MB of static files, 2 MB of which is the HEIC decoder that only loads
@@ -43,11 +75,22 @@ boilerplate: it caches the content-hashed `/assets/` forever and forbids caching
 of either is how a browser ends up asking for asset hashes the server no longer
 has.
 
-## Demo
-https://pikado.koneb.me
+</details>
 
-<img width="1799" height="1041" alt="image" src="https://github.com/user-attachments/assets/d999296e-0532-469d-a47b-0f8b63c984b3" />
+## Screenshots
 
+<table>
+  <tr>
+    <td align="center"><img src="docs/start.png" alt="The start screen with document templates and recent projects" width="420"><br>The start screen</td>
+    <td align="center"><img src="docs/menus.jpg" alt="The Layer menu open on its New Adjustment Layer submenu, drawn as translucent glass over the photo" width="420"><br>Glass menus</td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/camera-raw.jpg" alt="The Camera Raw Filter dialog with white balance, tone and presence sliders" width="420"><br>Camera Raw</td>
+    <td align="center"><img src="docs/editor.jpg" alt="The editor with a photo, a Curves adjustment layer and a text layer" width="420"><br>Layers, adjustments and type</td>
+  </tr>
+</table>
+
+The original project has a hosted demo at <https://pikado.koneb.me>. It runs the original code, without this fork's changes.
 
 ## What it is
 
@@ -78,6 +121,9 @@ your recent projects with thumbnails, dimensions, layer counts and when you last
 touched them. Drop a file anywhere on the window and it opens — hold Shift to
 place it into the current document as a layer instead. Close the last document
 and the start screen comes back.
+
+<details>
+<summary>Dragging images in from other tabs, between your own documents, HEIC and ICNS</summary>
 
 Images dragged straight out of another browser tab open the same way, at their
 full size; you do not have to save them first. When the image sits inside a link
@@ -142,12 +188,17 @@ the Dock ask for, up to 1024 px — except sizes larger than the document, which
 are left out rather than upscaled into a blurrier icon than macOS would make
 itself.
 
+</details>
+
 ## Your work stays in this browser
 
 Pikado autosaves. Open documents survive a refresh, a crash, and a laptop lid.
 There is no server and no account, and nothing is uploaded — with the single,
 opt-in exception of [Generative Fill](#generative-fill), which needs your own API
 key and asks before it sends anything.
+
+<details>
+<summary>Where, what, when, and the stated limits of autosave</summary>
 
 - **Where.** IndexedDB, with the metadata and the payload in *separate* object
   stores: a small record per project (name, size, layer count, timestamp,
@@ -175,12 +226,17 @@ key and asks before it sends anything.
   IndexedDB entirely — then autosave stays off, and the refresh confirmation
   prompt comes back, because in that one case a refresh really would lose work.
 
+</details>
+
 ## Offline, and installable
 
 Pikado never needed the network to do its work — every pixel is processed in the
 tab. "Offline" only ever meant the shell could not be downloaded. A service
 worker fixes that: the first visit caches the app, every later visit runs from
 the cache, and a cold start with no network works.
+
+<details>
+<summary>How the service worker, the HEIC decoder and updates behave</summary>
 
 The worker is hand-written rather than generated, because Vite hashes asset
 filenames and a precache manifest would have to be built alongside them. It picks
@@ -201,11 +257,16 @@ in an app that keeps your work locally it is not an error. When a new version ha
 been fetched you get an "Update ready" button; Pikado will not reload the page on
 your behalf, since you might be halfway through a brush stroke.
 
+</details>
+
 ## Selecting the hard things
 
 Most selection tools answer "which pixels look like the one I clicked". Select
 and Mask answers a harder question — "where does this object end" — and it does
 it with two classical algorithms rather than a model.
+
+<details>
+<summary>The cut, the matte and Select Subject</summary>
 
 **The cut.** Paint a few strokes to say what is definitely subject and definitely
 background. Pikado fits a five-component Gaussian mixture to each set of colours,
@@ -240,12 +301,17 @@ that stands out from its background. It does not know what a person is, and when
 saliency finds nothing convincing it says so instead of selecting the whole
 frame.
 
+</details>
+
 ## Camera Raw
 
 A develop module: white balance, exposure, the four tone-region sliders, contrast,
 a tone curve, texture, clarity, dehaze, an eight-band colour mixer, colour
 grading, sharpening, noise reduction, grain and vignette. `Shift+Ctrl+A`, or
 Filter > Camera Raw Filter.
+
+<details>
+<summary>How it works, and two honest notes</summary>
 
 It is registered as an ordinary filter, and that is the interesting part: a filter
 is what a Smart Object's filter stack stores, so on a Smart Object the whole
@@ -265,6 +331,8 @@ rather than a Kelvin reading, because a rendered sRGB image has no sensor white
 balance to set — the same choice Photoshop makes for this filter on a non-raw
 layer.
 
+</details>
+
 ## Generative Fill
 
 Select a region, describe what should be there, and the result arrives as a new
@@ -275,6 +343,9 @@ Edit menu, because they are the same job done two ways.
 **This is the only part of Pikado that can send your work anywhere.** (Web
 fonts also use the network, but only ever to fetch a font — see
 [Fonts](#fonts).) So it is built to be refused easily:
+
+<details>
+<summary>How: keys, consent, models and what actually gets sent</summary>
 
 - **You bring the key.** Pikado ships no API credentials — in a static
   client-side app there is no such thing as a secret key, because anything in the
@@ -343,12 +414,17 @@ the full request size rather than upscaling a tight bounding box, so a small
 selection in a large image is sent at native resolution with real context around
 it instead of a blurry enlargement.
 
+</details>
+
 ## Frame animation
 
 Window > Timeline gives you a filmstrip. A frame is a *record of layer state* —
 which layers are visible and at what opacity — not a copy of the picture, so a
 twenty-frame animation costs twenty small objects rather than twenty canvases,
 and painting on a layer updates every frame that shows it.
+
+<details>
+<summary>How frames work, and what is not animated</summary>
 
 Select a frame and work normally: what you change is written back into the frame
 you are on. Make Frames From Layers turns a stack of drawings into an animation
@@ -361,11 +437,16 @@ document-sized with no per-layer offset, so there is nowhere for a per-frame
 position to live. Move something by duplicating the layer, or cross-fade by
 animating opacity.
 
+</details>
+
 ## Colour management
 
 Six working spaces (sRGB, Adobe RGB 1998, Display P3, ProPhoto RGB, Rec. 2020,
 Gray Gamma 2.2), Assign Profile and Convert to Profile under the Image menu, and
 soft proofing with a gamut warning under View.
+
+<details>
+<summary>Assign, Convert, soft proofing and embedded profiles</summary>
 
 The distinction the two commands exist to make: **Assign** relabels the pixels
 without moving them, so the picture looks different; **Convert** moves the pixels
@@ -394,6 +475,8 @@ than misinterpreted, and since Perceptual and Saturation live entirely in those
 tables, those two intents behave as Relative Colorimetric and the dialog tells you
 so.
 
+</details>
+
 ## Right-click does the right thing
 
 Right-clicking the canvas asks the active tool what it can do *here*, at the
@@ -407,6 +490,9 @@ Cut, Fill, Stroke, Content-Aware Fill — and with no selection yet it offers th
 ways to get one instead. Mid-polygon it is just Close Path and Cancel, because
 that is all that makes sense mid-gesture. The Ruler offers Clear Measurement.
 
+<details>
+<summary>The shared tail and where the entries come from</summary>
+
 Every menu also carries a short shared tail (Free Transform, Fit on Screen,
 100%), so right-click is never a dead gesture even on a tool with nothing
 specific to say.
@@ -416,6 +502,8 @@ and enabled state come from one place and cannot disagree with the menu bar.
 Items that cannot apply right now are dropped rather than shown greyed, and the
 separators around them close up.
 
+</details>
+
 ## Fonts
 
 Thirty families are built in. The rest of Google Fonts — 1,941 of them — is
@@ -423,6 +511,9 @@ behind **Type ▸ Manage Fonts**, with search, category filters, and a specimen 
 each rendered in its own face. The same list is the last row of every font
 picker, because "which font?" and "is there another font?" are the same
 question.
+
+<details>
+<summary>Downloads, offline use and how a document records its fonts</summary>
 
 **A font you download is kept.** The bytes go into IndexedDB and are registered
 again on the next visit, so a family works with the network off — including when
@@ -447,12 +538,17 @@ gzipped, loaded only when the browser opens. There is no API key anywhere: the
 endpoint that lists them is unreachable from a browser, and a key in a
 client-side bundle is not a secret.
 
+</details>
+
 ## Liquify, including faces
 
 Ten tools on one forward-displacement mesh — Forward Warp, Reconstruct, Smooth,
 both Twirls, Pucker, Bloat, Push Left, and Freeze/Thaw masking — with a live
 preview. Nothing compounds: the mesh is inverse-mapped once from the untouched
 original, so pushing pixels around all afternoon costs exactly one resample.
+
+<details>
+<summary>The face-aware sliders</summary>
 
 Sixteen **face-aware sliders** sit on the same mesh: eye size, height, width,
 tilt and distance; nose height and width; smile, upper and lower lip, mouth
@@ -465,6 +561,8 @@ The face is **the region you are working on**: select a face and the sliders act
 on it. There is no automatic detection, and that is a deliberate absence rather
 than an oversight — see the limitations at the end.
 
+</details>
+
 ## Things line up
 
 Drag a layer, pull out a selection, draw a shape, slide a crop box or move a
@@ -475,6 +573,9 @@ edge beats a neighbouring layer beats the grid — otherwise a guide sitting one
 unit off a grid line would be unreachable. Hold <kbd>Ctrl</kbd> to place
 something exactly where you dropped it, or turn the whole thing off with
 <kbd>Shift</kbd>+<kbd>Ctrl</kbd>+<kbd>;</kbd>.
+
+<details>
+<summary>Guides, tolerance and what deliberately does not snap</summary>
 
 Magenta lines show what the drag is currently lined up with, and if it lines up
 with three things at once you see all three. They are drawn from what the
@@ -490,6 +591,8 @@ snaps as a point, a box being slid snaps as a rectangle, so its far edge
 catches a guide as readily as its near one. A rotated crop box and a rotated or
 skewed transform deliberately do not snap: they work in their own space, and a
 guide is a line in the document's.
+
+</details>
 
 ## Architecture
 
@@ -796,4 +899,10 @@ HEIC decoding uses [libheif](https://github.com/strukturag/libheif) and
 [libde265](https://github.com/strukturag/libde265), through
 [libheif-js](https://github.com/catdad-experiments/libheif-js), all LGPL-3.0.
 It ships as the package's own file, unmodified and loaded separately from the
-rest of Pikado, so it can be replaced with any compatible build.
+rest of Pikado, so it can be replaced with any compatible build. Both licence
+texts ship with every build, in `licenses/`.
+
+This is a fork of [koneb71/pikado](https://github.com/koneb71/pikado) by
+Neiell Care L. Paradiang. [NOTICE](NOTICE) lists every third-party component
+and [CHANGELOG.md](CHANGELOG.md) what the fork changes; security reports go
+through [SECURITY.md](SECURITY.md).

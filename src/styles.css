@@ -469,14 +469,25 @@ input[type="number"].pk-num { width: 54px; text-align: right; font-variant-numer
  * The blur was also costing real frames. `backdrop-filter` on a full-viewport
  * element forces the compositor to re-blur everything beneath it on every frame,
  * and beneath it is a canvas being re-rendered on every slider drag.
+ *
+ * The dialog box itself is glass unless Preferences says otherwise
+ * (src/ui/glass.css overrides the opaque look below), which is a different
+ * thing: it blurs only what is underneath the dialog, never the canvas you can
+ * see around it. It is not free — that patch is re-blurred on each preview
+ * frame — but it is the dialog's own area rather than the viewport's.
  */
 .pk-dialog-overlay {
   position: fixed; inset: 0;
   background: transparent;
   display: flex; align-items: center; justify-content: center;
-  opacity: 0; transition: opacity .14s ease;
 }
-.pk-dialog-overlay.open { opacity: 1; }
+/* The fade is on the dialog, not on the overlay around it. An ancestor at less
+   than full opacity cuts its descendants off from the page behind them, so a
+   fading overlay left the glass with no backdrop to blur: the dialog arrived as
+   a see-through pane with the picture sharp behind its labels, then snapped to
+   glass on the last frame. An element's own opacity does not do that. */
+.pk-dialog-overlay > .pk-dialog { opacity: 0; transition: opacity .14s ease; }
+.pk-dialog-overlay.open > .pk-dialog { opacity: 1; }
 
 .pk-dialog {
   background: var(--s2);

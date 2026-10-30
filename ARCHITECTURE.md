@@ -1532,6 +1532,22 @@ Never write outside your own list — parallel work depends on it.
 **CSS:** put component styles in a sibling `.css` file and `import './x.css'`
 from your module. Vite bundles it. Never edit `src/styles.css`.
 
+Everything that floats over the canvas — menus, flyouts, tooltips, the slider
+popover, toasts and dialogs — is glass, and `src/ui/glass.css` is where. It is
+an override: each of those components still carries its own opaque background,
+border and shadow in its own stylesheet, and `glass.css` wins by specificity
+rather than by load order. `pk-glass-off` on the root stops it matching, which
+is all that Preferences > Interface > Glass: Off does, and what an OS asking for
+reduced transparency or forced colours gets too (`applyStoredPreferences`).
+`pk-glass-subtle` darkens the pane; `pk-glass-refract` adds the edge lens built
+in `src/ui/glass.js`, in Chromium only.
+
+So a new floating surface needs two things: an opaque look of its own, and its
+class added to the lists in `glass.css`. On glass the text tokens `--text`,
+`--text-dim` and `--text-faint` are each one step lighter, which is what lets
+the pane be as bright as it is; use the tokens and the surface stays readable,
+hard-code a grey and it will not.
+
 Base classes available from `src/styles.css`: `pk-btn`, `pk-btn primary`,
 `pk-btn subtle`, `pk-icon-btn`, `pk-input`, `pk-select`, `pk-range`, `pk-num`,
 `pk-check`, `pk-radio`, `pk-field`, `pk-form`, `pk-slider-row`, `pk-sep`,

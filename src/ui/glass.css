@@ -1,0 +1,96 @@
+/* Liquid glass, for the surfaces that float over the canvas.
+
+   The tokens (--lg-*) and the recipe are LiquidGlass-UI's, vendored in
+   src/vendor/liquid-glass.css. The rule below is its `.lg-surface` restated for
+   Pikado's own class names, so no markup has to change, plus the top sheen its
+   components draw. Corner radii stay with each component.
+
+   It is an override. Every surface listed here still carries its own opaque
+   look in its own stylesheet, and this file wins by specificity, never by the
+   order the stylesheets happen to load in. Put `pk-glass-off` on the root and
+   nothing below matches, which is the whole of "Glass: Off" — and of reduced
+   transparency and forced colours, which set the same class (see
+   applyStoredPreferences).
+
+   Only things that sit over the picture are listed. The docked chrome rests on
+   the flat app frame, where a backdrop filter would blur a single colour and
+   pay for a compositing layer to do it. */
+
+:root {
+  /* The library's default pane is 7.5% white, which assumes a dark backdrop:
+     over a white document it leaves Pikado's grey text unreadable. So the tint
+     is Pikado's own --s2, and the backdrop is darkened rather than the tint
+     made heavier — darkening lets the picture's colour through, where a denser
+     tint flattens it to grey. Saturation is pushed to give some of that colour
+     back.
+
+     Brightness, tint and sheen are set by measurement, not by eye. Over an
+     all-white document, the worst case, --text-dim on the glass — what dialog
+     field labels are set in — has to hold 4.5:1, and --text-faint must be no
+     worse than on the opaque surface underneath. At these values the labels
+     measure 4.6:1 (5.0 opaque), body text 7.2 (10 opaque) and faint text 2.9
+     (2.8 opaque): glass costs some contrast and stops at that floor. The text
+     tiers in the rule below are what buy the brightness; raise it further and
+     it is those labels that go first. */
+  --lg-tint: 28, 28, 34;
+  --lg-tint-strength: 0.3;
+  --lg-brightness: 30%;
+  --lg-saturate: 190%;
+  --lg-sheen: 0.06;
+  --lg-border: var(--hair-2);
+  --lg-shadow: var(--sh-3);
+  --pk-glass: blur(var(--lg-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness));
+  --pk-glass-lens: blur(8px) saturate(var(--lg-saturate)) brightness(var(--lg-brightness));
+}
+
+/* Preferences > Interface > Glass: Subtle. A darker, denser pane. */
+:root.pk-glass-subtle {
+  --lg-tint-strength: 0.4;
+  --lg-brightness: 12%;
+}
+
+/* Everything from here on needs a backdrop filter to be legible: a 30% tint
+   with nothing blurred or darkened behind it is the picture with text on top.
+   A browser without one keeps the opaque surfaces instead. */
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root:not(.pk-glass-off) :is(.pk-menu, .pk-flyout, .pk-tooltip, .pk-ob-popover, .pk-toast, .pk-dialog) {
+    /* Each tier of text moves one step lighter on glass: faint takes the value
+       dim has elsewhere, and so on up. A pane that lets light through is a
+       lighter ground than --s3, and this is what lets it be one. */
+    --text: #dcdce4;
+    --text-dim: #b0b0bc;
+    --text-faint: #8b8b98;
+    background:
+      linear-gradient(rgba(255, 255, 255, var(--lg-sheen)), transparent 42%),
+      var(--lg-fill);
+    -webkit-backdrop-filter: var(--pk-glass);
+    backdrop-filter: var(--pk-glass);
+    border: 1px solid var(--lg-border);
+    box-shadow: var(--lg-shadow), var(--lg-specular), var(--lg-occlusion);
+  }
+
+  /* Redefining --text does not reach text that sets no colour of its own: that
+     inherits the value `body` already resolved. So the surfaces restate it — at
+     zero specificity, to replace what is inherited without ever outranking a
+     component that chose its colour (toasts and tooltips are --text-hi). */
+  :where(:root:not(.pk-glass-off)) :where(.pk-menu, .pk-flyout, .pk-tooltip, .pk-ob-popover, .pk-toast, .pk-dialog) {
+    color: var(--text);
+  }
+
+  /* Edge refraction, switched on in Preferences > Interface. The filter itself is
+     built by glass.js, and the class is only ever set in Chromium, the one engine
+     that paints it, and never while glass is off (see applyStoredPreferences).
+     Two surfaces are left out. Tooltips: a pane 25px tall is all edge. Dialogs:
+     the bend is a fraction of the surface, so a wide dialog bends too far, and it
+     is the dearest place to do it, over a canvas redrawn on every slider tick.
+
+     The blur drops to 8px here, and has to. A lens bends edges, and an 18px blur
+     leaves no edges to bend: at the full blur the filter changed rim pixels by
+     under 2 in 255 at any strength, which is a GPU cost with nothing to show for
+     it. The price is that shapes behind the text keep more of their outline; the
+     contrast figures above do not move, because blur does not change how bright
+     a white backdrop is. */
+  :root.pk-glass-refract:not(.pk-glass-off) :is(.pk-menu, .pk-flyout, .pk-ob-popover, .pk-toast) {
+    backdrop-filter: var(--pk-glass-lens) url(#pk-glass-refract);
+  }
+}

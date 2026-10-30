@@ -1,4 +1,5 @@
 import './styles.css';
+import './ui/glass.js';
 
 import { app } from './core/app.js';
 import { CanvasView } from './ui/canvas-view.js';

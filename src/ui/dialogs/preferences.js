@@ -31,6 +31,8 @@ export const PREF_DEFAULTS = {
   toolbarWidth: 50,
   rowHeight: 28,
   cornerRadius: 6, // --r-sm
+  glass: 'full',
+  glassRefraction: false, // Chromium only, and the dearest thing glass can do
   /* Tools */
   brushCursor: 'normal',
   showToolTips: true,
@@ -107,6 +109,20 @@ const CATEGORIES = [
       { key: 'toolbarWidth', label: 'Toolbar Width', type: 'slider', min: 40, max: 76, step: 2, unit: 'px' },
       { key: 'rowHeight', label: 'Control Height', type: 'slider', min: 20, max: 34, step: 1, unit: 'px' },
       { key: 'cornerRadius', label: 'Corner Radius', type: 'slider', min: 0, max: 10, step: 1, unit: 'px' },
+      {
+        key: 'glass', label: 'Glass', type: 'select',
+        options: [
+          { value: 'full', label: 'Full' },
+          { value: 'subtle', label: 'Subtle' },
+          { value: 'off', label: 'Off' },
+        ],
+        hint: 'Menus, dialogs and other floating surfaces let the image show through. '
+          + 'Subtle is darker and steadier; Off is opaque and the lightest on the GPU.',
+      },
+      {
+        key: 'glassRefraction', label: 'Refract the edges of glass surfaces', type: 'checkbox',
+        hint: 'Bends the image at the rim of menus and toasts. Chrome, Edge and other Chromium browsers only; uses more GPU.',
+      },
     ],
   },
   {
@@ -255,6 +271,12 @@ function shade(hex, amount) {
 
 let firstApply = true;
 
+/* The OS settings that mean "no glass". Re-applied when either changes, so
+   flipping Reduce Transparency takes effect without a reload. */
+const WANTS_OPAQUE = ['(prefers-reduced-transparency: reduce)', '(forced-colors: active)']
+  .map((q) => matchMedia(q));
+for (const m of WANTS_OPAQUE) m.addEventListener('change', () => applyStoredPreferences());
+
 /**
  * Push the stored preferences onto the app singleton and the document root.
  * Safe to call at any time; runs once automatically on import.
@@ -294,6 +316,21 @@ export function applyStoredPreferences() {
   root.style.setProperty('--toolbar-w', `${p.toolbarWidth}px`);
   root.style.setProperty('--row-h', `${p.rowHeight}px`);
   root.style.setProperty('--radius', `${p.cornerRadius}px`);
+  /* Glass (src/ui/glass.css) is an override on top of each surface's own opaque
+     look, so "off" is simply the class that stops the override matching. An OS
+     asking for less transparency, or for forced colours, gets the same thing:
+     decided here rather than in a media query so that all three land on exactly
+     the surfaces Pikado had before glass, not on an approximation of them. */
+  const glassOff = p.glass === 'off' || WANTS_OPAQUE.some((m) => m.matches);
+  root.classList.toggle('pk-glass-off', glassOff);
+  root.classList.toggle('pk-glass-subtle', p.glass === 'subtle');
+  /* Only Chromium paints an SVG filter in a backdrop, and `@supports` cannot be
+     asked: WebKit and Firefox both report `backdrop-filter: url(#x)` as
+     supported, and by LiquidGlass-UI's account neither draws it.
+     `userAgentData` exists in Chromium alone.
+     shortcut: it is also missing on plain http, so refraction is off there;
+     switch to a painted-pixel probe if that ever matters. */
+  root.classList.toggle('pk-glass-refract', !glassOff && !!p.glassRefraction && 'userAgentData' in navigator);
 
   if (firstApply) {
     firstApply = false;

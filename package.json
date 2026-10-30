@@ -6,13 +6,13 @@
   "description": "Free, open-source Photoshop alternative that runs in your browser. Layers, masks, PSD files, filters and adjustments \u2014 no install, no account, nothing uploaded except the optional Generative Fill you enable with your own API key.",
   "license": "MIT",
   "author": "Neiell Care L. Paradiang",
-  "homepage": "https://github.com/koneb71/pikado#readme",
+  "homepage": "https://github.com/Gitguy268/pikado#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/koneb71/pikado.git"
+    "url": "git+https://github.com/Gitguy268/pikado.git"
   },
   "bugs": {
-    "url": "https://github.com/koneb71/pikado/issues"
+    "url": "https://github.com/Gitguy268/pikado/issues"
   },
   "keywords": [
     "image-editor",

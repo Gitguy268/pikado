@@ -9,7 +9,7 @@ has already been bitten by their absence, and the scars are in the git history.
 ## Getting set up
 
 ```bash
-git clone https://github.com/koneb71/pikado.git
+git clone https://github.com/Gitguy268/pikado.git
 cd pikado
 npm install
 npm run dev
@@ -113,7 +113,7 @@ that are not obvious:
 ## Reporting bugs
 
 Open an issue at
-[github.com/koneb71/pikado/issues](https://github.com/koneb71/pikado/issues)
+[github.com/Gitguy268/pikado/issues](https://github.com/Gitguy268/pikado/issues)
 with the browser and version, what you did, what happened, and what you
 expected. A document that reproduces it is ideal — Pikado's own `.pkd` files
 keep the full layer stack.
@@ -128,4 +128,5 @@ Pikado has no backend, no accounts and no network calls except an optional
 Google Fonts stylesheet. That removes most of the usual attack surface, but not
 all of it: the PSD, PNG and ICC parsers read untrusted bytes, and a malformed
 file that hangs the tab or reads out of bounds is a real bug. Please report
-those privately by email rather than in a public issue.
+those privately, as [SECURITY.md](SECURITY.md) describes, rather than in a
+public issue.
