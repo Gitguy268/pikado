@@ -38,3 +38,6 @@ pnpm-debug.log*
 scratch/
 *.pkd.bak
 pikado-glass-checks/
+.vercel/
+.env.*
+!.env.example
