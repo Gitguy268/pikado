@@ -38,10 +38,37 @@ everything keeps working without any of them.
 
 </details>
 
+<!-- run-steps:start -->
+## Run it locally, step by step
+
+1. **Install [Node.js](https://nodejs.org) 22** or newer.
+
+2. **Get the code:**
+
+   ```sh
+   git clone https://github.com/Gitguy268/pikado.git
+   cd pikado
+   ```
+
+3. **Install the dependencies:**
+
+   ```sh
+   npm install
+   ```
+
+4. **Start it:**
+
+   ```sh
+   npm run dev
+   ```
+
+5. **Open <http://localhost:5173/>** in your browser. Press `Ctrl+C` in the terminal to stop.
+<!-- run-steps:end -->
+
 ## Quick start
 
 ```bash
-# not on GitHub yet: start from a copy of this folder
+git clone https://github.com/Gitguy268/pikado.git
 cd pikado
 npm install
 npm run dev      # http://localhost:5173 (Vite takes the next free port if busy)
