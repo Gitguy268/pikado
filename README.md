@@ -38,6 +38,10 @@ everything keeps working without any of them.
 
 </details>
 
+<!-- live-links -->
+**Live:** [gitguy268.github.io/pikado](https://gitguy268.github.io/pikado/) · [pikado-gules.vercel.app](https://pikado-gules.vercel.app)
+<!-- /live-links -->
+
 <!-- run-steps:start -->
 ## Run it locally, step by step
 
